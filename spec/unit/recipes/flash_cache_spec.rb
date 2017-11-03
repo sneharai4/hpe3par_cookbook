@@ -16,6 +16,12 @@ describe 'hpe3par::flash_cache' do
   let(:chef_run) do
     ChefSpec::SoloRunner.new(platform: PLATFORM, version: PLATFORM_VERSION,
                              step_into: ['flah_cache']) do |node|
+   node.override['hpe3par']['storage_system'] = {
+       name: 'MY_3PAR',
+       ip: '1.1.1.1.1',
+       user: 'chef',
+       password: 'chef'
+   }
     node.override['hpe3par']['flash_cache']['size_in_gib'] = 64
     end.converge(described_recipe)
   end
