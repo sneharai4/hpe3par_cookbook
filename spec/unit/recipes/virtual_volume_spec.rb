@@ -16,36 +16,43 @@ describe 'hpe3par::virtual_volume' do
   let(:chef_run) do
     ChefSpec::SoloRunner.new(platform: PLATFORM, version: PLATFORM_VERSION,
                              step_into: ['virtual_volume']) do |node|
-       node.override['hpe3par']['virtual_volume']['name'] = 'chef_vol_thin2'
-       node.override['hpe3par']['virtual_volume']['cpg'] = 'FC_r1'
-       node.override['hpe3par']['virtual_volume']['size'] = 1024.0
-       node.override['hpe3par']['virtual_volume']['size_unit'] = 'MiB'
-       node.override['hpe3par']['virtual_volume']['type'] = 'thin'
-       node.override['hpe3par']['virtual_volume']['compression'] = false
-       node.override['hpe3par']['virtual_volume']['snap_cpg'] = 'FC_r1'
+                               
+       node.normal['hpe3par']['storage_system'] = {
+           name: 'MY_3PAR',
+           ip: '1.1.1.1.1',
+           user: 'chef',
+           password: 'chef'
+       }
+       node.normal['hpe3par']['virtual_volume']['name'] = 'chef_vol_thin2'
+       node.normal['hpe3par']['virtual_volume']['cpg'] = 'FC_r1'
+       node.normal['hpe3par']['virtual_volume']['size'] = 1024.0
+       node.normal['hpe3par']['virtual_volume']['size_unit'] = 'MiB'
+       node.normal['hpe3par']['virtual_volume']['type'] = 'thin'
+       node.normal['hpe3par']['virtual_volume']['compression'] = false
+       node.normal['hpe3par']['virtual_volume']['snap_cpg'] = 'FC_r1'
        
        #virtual_volume modify
-       node.override['hpe3par']['virtual_volume']['modify']['snap_cpg'] = 'FC_r1'
-       node.override['hpe3par']['virtual_volume']['modify']['new_name'] = 'chef_vol_thin2_1'
+       node.normal['hpe3par']['virtual_volume']['modify']['snap_cpg'] = 'FC_r1'
+       node.normal['hpe3par']['virtual_volume']['modify']['new_name'] = 'chef_vol_thin2_1'
        
-       node.override['hpe3par']['virtual_volume']['modify']['ss_spc_alloc_warning_pct'] = 0
-       node.override['hpe3par']['virtual_volume']['modify']['ss_spc_alloc_limit_pct'] = 0
-       node.override['hpe3par']['virtual_volume']['modify']['rm_ss_spc_alloc_warning'] = false
-       node.override['hpe3par']['virtual_volume']['modify']['usr_spc_alloc_warning_pct'] = 0
-       node.override['hpe3par']['virtual_volume']['modify']['usr_spc_alloc_limit_pct'] = 0
-       node.override['hpe3par']['virtual_volume']['modify']['rm_usr_spc_alloc_warning'] = false
-       node.override['hpe3par']['virtual_volume']['modify']['expiration_hours'] = 0
-       node.override['hpe3par']['virtual_volume']['modify']['retention_hours'] = 0
-       node.override['hpe3par']['virtual_volume']['modify']['rm_exp_time'] = false
-       node.override['hpe3par']['virtual_volume']['modify']['rm_ss_spc_alloc_limit'] = false
-       node.override['hpe3par']['virtual_volume']['modify']['rm_usr_spc_alloc_limit'] = false
+       node.normal['hpe3par']['virtual_volume']['modify']['ss_spc_alloc_warning_pct'] = 0
+       node.normal['hpe3par']['virtual_volume']['modify']['ss_spc_alloc_limit_pct'] = 0
+       node.normal['hpe3par']['virtual_volume']['modify']['rm_ss_spc_alloc_warning'] = false
+       node.normal['hpe3par']['virtual_volume']['modify']['usr_spc_alloc_warning_pct'] = 0
+       node.normal['hpe3par']['virtual_volume']['modify']['usr_spc_alloc_limit_pct'] = 0
+       node.normal['hpe3par']['virtual_volume']['modify']['rm_usr_spc_alloc_warning'] = false
+       node.normal['hpe3par']['virtual_volume']['modify']['expiration_hours'] = 0
+       node.normal['hpe3par']['virtual_volume']['modify']['retention_hours'] = 0
+       node.normal['hpe3par']['virtual_volume']['modify']['rm_exp_time'] = false
+       node.normal['hpe3par']['virtual_volume']['modify']['rm_ss_spc_alloc_limit'] = false
+       node.normal['hpe3par']['virtual_volume']['modify']['rm_usr_spc_alloc_limit'] = false
        
        #virtual_volume tune
-       node.override['hpe3par']['virtual_volume']['tune']['user_cpg'] = 'FC_r1'
-       node.override['hpe3par']['virtual_volume']['tune']['snap_cpg'] = 'FC_r1'
-       node.override['hpe3par']['virtual_volume']['tune']['type'] = 'full'
-       node.override['hpe3par']['virtual_volume']['tune']['keep_vv'] = 'vol_bkup'
-       node.override['hpe3par']['virtual_volume']['tune']['compression'] = false
+       node.normal['hpe3par']['virtual_volume']['tune']['user_cpg'] = 'FC_r1'
+       node.normal['hpe3par']['virtual_volume']['tune']['snap_cpg'] = 'FC_r1'
+       node.normal['hpe3par']['virtual_volume']['tune']['type'] = 'full'
+       node.normal['hpe3par']['virtual_volume']['tune']['keep_vv'] = 'vol_bkup'
+       node.normal['hpe3par']['virtual_volume']['tune']['compression'] = false
     end.converge(described_recipe)
   end
 
@@ -72,46 +79,10 @@ describe 'hpe3par::virtual_volume' do
   it 'converts the type of the virtual_volume through convert_type' do
     expect(chef_run).to convert_type_hpe3par_virtual_volume(chef_run.node['hpe3par']['virtual_volume']['name'])
   end
-  
-  let(:chef_run_inv) do
-    ChefSpec::SoloRunner.new(platform: PLATFORM, version: PLATFORM_VERSION,
-                             step_into: ['virtual_volume']) do |node|
-       node.override['hpe3par']['virtual_volume']['name'] = 'chef_vol_thin2'
-       node.override['hpe3par']['virtual_volume']['cpg'] = 'FC_r1'
-       node.override['hpe3par']['virtual_volume']['size'] = 1024.0
-       node.override['hpe3par']['virtual_volume']['size_unit'] = 'INVALID'
-       node.override['hpe3par']['virtual_volume']['type'] = 'thin'
-       node.override['hpe3par']['virtual_volume']['compression'] = false
-       node.override['hpe3par']['virtual_volume']['snap_cpg'] = 'FC_r1'
-       
-       #virtual_volume modify
-       node.override['hpe3par']['virtual_volume']['modify']['snap_cpg'] = 'FC_r1'
-       node.override['hpe3par']['virtual_volume']['modify']['new_name'] = 'chef_vol_thin2_1'
-       
-       node.override['hpe3par']['virtual_volume']['modify']['ss_spc_alloc_warning_pct'] = 0
-       node.override['hpe3par']['virtual_volume']['modify']['ss_spc_alloc_limit_pct'] = 0
-       node.override['hpe3par']['virtual_volume']['modify']['rm_ss_spc_alloc_warning'] = false
-       node.override['hpe3par']['virtual_volume']['modify']['usr_spc_alloc_warning_pct'] = 0
-       node.override['hpe3par']['virtual_volume']['modify']['usr_spc_alloc_limit_pct'] = 0
-       node.override['hpe3par']['virtual_volume']['modify']['rm_usr_spc_alloc_warning'] = false
-       node.override['hpe3par']['virtual_volume']['modify']['expiration_hours'] = 0
-       node.override['hpe3par']['virtual_volume']['modify']['retention_hours'] = 0
-       node.override['hpe3par']['virtual_volume']['modify']['rm_exp_time'] = false
-       node.override['hpe3par']['virtual_volume']['modify']['rm_ss_spc_alloc_limit'] = false
-       node.override['hpe3par']['virtual_volume']['modify']['rm_usr_spc_alloc_limit'] = false
-       
-       #virtual_volume tune
-       node.override['hpe3par']['virtual_volume']['tune']['user_cpg'] = 'FC_r1'
-       node.override['hpe3par']['virtual_volume']['tune']['snap_cpg'] = 'FC_r1'
-       node.override['hpe3par']['virtual_volume']['tune']['type'] = 'full'
-       node.override['hpe3par']['virtual_volume']['tune']['keep_vv'] = 'vol_bkup'
-       node.override['hpe3par']['virtual_volume']['tune']['compression'] = false
-    end.converge(described_recipe)
-  end
 
   it 'creates the virtual_volume with invalid size unit' do
-    expect{ (chef_run_inv).to create_hpe3par_virtual_volume(chef_run_inv.node['hpe3par']['virtual_volume']['name']) }.to raise_error(Chef::Exceptions::ValidationFailed,
+    chef_run.node.normal['hpe3par']['virtual_volume']['size_unit'] = 'INVALID'
+    expect{ chef_run.converge(described_recipe) }.to raise_error(Chef::Exceptions::ValidationFailed,
       'Option size_unit must be equal to one of: TiB, GiB, MiB!  You passed "INVALID".')
   end
-
 end

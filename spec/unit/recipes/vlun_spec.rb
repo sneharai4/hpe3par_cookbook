@@ -16,7 +16,12 @@ describe 'hpe3par::vlun' do
   let(:chef_run) do
     ChefSpec::SoloRunner.new(platform: PLATFORM, version: PLATFORM_VERSION,
                              step_into: ['vlun']) do |node|
-                               
+     node.override['hpe3par']['storage_system'] = {
+         name: 'MY_3PAR',
+         ip: '1.1.1.1.1',
+         user: 'chef',
+         password: 'chef'
+     }
       node.override['hpe3par']['vlun']['export_volume_to_host']['volume_name'] = 'test_chef_volume'
       node.override['hpe3par']['vlun']['export_volume_to_host']['host_name'] = 'test_chef_host'
       node.override['hpe3par']['vlun']['unexport_volume_to_host']['volume_name'] = 'test_chef_volume'

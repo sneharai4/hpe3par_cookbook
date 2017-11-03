@@ -16,6 +16,12 @@ describe 'hpe3par::volume_set' do
   let(:chef_run) do
     ChefSpec::SoloRunner.new(platform: PLATFORM, version: PLATFORM_VERSION,
                              step_into: ['volume_set']) do |node|
+       node.override['hpe3par']['storage_system'] = {
+           name: 'MY_3PAR',
+           ip: '1.1.1.1.1',
+           user: 'chef',
+           password: 'chef'
+       }
                                #volumeset create
        node.override['hpe3par']['volume_set']['create']['name'] = 'chef_volume_set'
        node.override['hpe3par']['volume_set']['create']['domain'] = 'my_domain'

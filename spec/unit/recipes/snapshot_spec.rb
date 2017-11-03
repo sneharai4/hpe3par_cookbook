@@ -16,6 +16,12 @@ describe 'hpe3par::snapshot' do
   let(:chef_run) do
     ChefSpec::SoloRunner.new(platform: PLATFORM, version: PLATFORM_VERSION,
                              step_into: ['snapshot']) do |node|
+       node.override['hpe3par']['storage_system'] = {
+           name: 'MY_3PAR',
+           ip: '1.1.1.1.1',
+           user: 'chef',
+           password: 'chef'
+       }
                                
        #Snapshot create
        node.override['hpe3par']['snapshot']['create']['snapshot_name'] = 'chef_thin_volume_vc'

@@ -16,33 +16,40 @@ describe 'hpe3par::clone' do
   let(:chef_run) do
     ChefSpec::SoloRunner.new(platform: PLATFORM, version: PLATFORM_VERSION,
                              step_into: ['clone']) do |node|
+                               
+       node.override['hpe3par']['storage_system'] = {
+           name: 'MY_3PAR',
+           ip: '1.1.1.1.1',
+           user: 'chef',
+           password: 'chef'
+       }
        #clone create_online
-       node.override['hpe3par']['clone']['create_online']['clone_name'] = 'chef_test_vol_clone'
-       node.override['hpe3par']['clone']['create_online']['base_volume_name'] = 'chef_vol_thin2'
-       node.override['hpe3par']['clone']['create_online']['dest_cpg'] = 'FC_r1'
-       node.override['hpe3par']['clone']['create_online']['online'] = true
-       node.override['hpe3par']['clone']['create_online']['tpvv'] = false
-       node.override['hpe3par']['clone']['create_online']['tdvv'] = false
-       node.override['hpe3par']['clone']['create_online']['snap_cpg'] = 'FC_r1'
-       node.override['hpe3par']['clone']['create_online']['compression'] = false
+       node.normal['hpe3par']['clone']['create_online']['clone_name'] = 'chef_test_vol_clone'
+       node.normal['hpe3par']['clone']['create_online']['base_volume_name'] = 'chef_vol_thin2'
+       node.normal['hpe3par']['clone']['create_online']['dest_cpg'] = 'FC_r1'
+       node.normal['hpe3par']['clone']['create_online']['online'] = true
+       node.normal['hpe3par']['clone']['create_online']['tpvv'] = false
+       node.normal['hpe3par']['clone']['create_online']['tdvv'] = false
+       node.normal['hpe3par']['clone']['create_online']['snap_cpg'] = 'FC_r1'
+       node.normal['hpe3par']['clone']['create_online']['compression'] = false
        
        #clone create_offline
-       node.override['hpe3par']['clone']['create_offline']['clone_name'] = 'chef_test_vol_clone'
-       node.override['hpe3par']['clone']['create_offline']['base_volume_name'] = 'chef_vol_thin2'
-       node.override['hpe3par']['clone']['create_offline']['dest_cpg'] = 'FC_r1'
-       node.override['hpe3par']['clone']['create_offline']['online'] = false
-       node.override['hpe3par']['clone']['create_offline']['save_snapshot'] = true
-       node.override['hpe3par']['clone']['create_offline']['priority'] = 'MEDIUM'
-       node.override['hpe3par']['clone']['create_offine']['skip_zero'] = false
+       node.normal['hpe3par']['clone']['create_offline']['clone_name'] = 'chef_test_vol_clone'
+       node.normal['hpe3par']['clone']['create_offline']['base_volume_name'] = 'chef_vol_thin2'
+       node.normal['hpe3par']['clone']['create_offline']['dest_cpg'] = 'FC_r1'
+       node.normal['hpe3par']['clone']['create_offline']['online'] = false
+       node.normal['hpe3par']['clone']['create_offline']['save_snapshot'] = true
+       node.normal['hpe3par']['clone']['create_offline']['priority'] = 'MEDIUM'
+       node.normal['hpe3par']['clone']['create_offline']['skip_zero'] = false
          
        #clone resync
-       node.override['hpe3par']['clone']['resync']['clone_name'] = 'chef_test_vol_clone'
+       node.normal['hpe3par']['clone']['resync']['clone_name'] = 'chef_test_vol_clone'
        
        #clone stop
-       node.override['hpe3par']['clone']['stop']['clone_name'] = 'chef_test_vol_clone'
+       node.normal['hpe3par']['clone']['stop']['clone_name'] = 'chef_test_vol_clone'
          
        #clone delete
-       node.override['hpe3par']['clone']['delete']['clone_name'] = 'chef_test_vol_clone'
+       node.normal['hpe3par']['clone']['delete']['clone_name'] = 'chef_test_vol_clone'
 
     end.converge(described_recipe)
   end
@@ -67,44 +74,11 @@ describe 'hpe3par::clone' do
   it 'deletes clone through delete clone' do
     expect(chef_run).to delete_hpe3par_clone(chef_run.node['hpe3par']['clone']['delete']['clone_name'])
   end
-  
-  let(:chef_run_pri) do
-    ChefSpec::SoloRunner.new(platform: PLATFORM, version: PLATFORM_VERSION,
-                             step_into: ['clone']) do |node|
-       #clone create_online
-       node.override['hpe3par']['clone']['create_online']['clone_name'] = 'chef_test_vol_clone'
-       node.override['hpe3par']['clone']['create_online']['base_volume_name'] = 'chef_vol_thin2'
-       node.override['hpe3par']['clone']['create_online']['dest_cpg'] = 'FC_r1'
-       node.override['hpe3par']['clone']['create_online']['online'] = true
-       node.override['hpe3par']['clone']['create_online']['tpvv'] = false
-       node.override['hpe3par']['clone']['create_online']['tdvv'] = false
-       node.override['hpe3par']['clone']['create_online']['snap_cpg'] = 'FC_r1'
-       node.override['hpe3par']['clone']['create_online']['compression'] = false
-       
-       #clone create_offline
-       node.override['hpe3par']['clone']['create_offline']['clone_name'] = 'chef_test_vol_clone'
-       node.override['hpe3par']['clone']['create_offline']['base_volume_name'] = 'chef_vol_thin2'
-       node.override['hpe3par']['clone']['create_offline']['dest_cpg'] = 'FC_r1'
-       node.override['hpe3par']['clone']['create_offline']['online'] = false
-       node.override['hpe3par']['clone']['create_offline']['save_snapshot'] = true
-       node.override['hpe3par']['clone']['create_offline']['priority'] = 'INVALID'
-       node.override['hpe3par']['clone']['create_offine']['skip_zero'] = false
-         
-       #clone resync
-       node.override['hpe3par']['clone']['resync']['clone_name'] = 'chef_test_vol_clone'
-       
-       #clone stop
-       node.override['hpe3par']['clone']['stop']['clone_name'] = 'chef_test_vol_clone'
-         
-       #clone delete
-       node.override['hpe3par']['clone']['delete']['clone_name'] = 'chef_test_vol_clone'
-
-    end.converge(described_recipe)
-  end
 
   it 'creates the offline clone through create offline clone with invalid priority value' do
-    expect{ (chef_run_pri).to create_online_hpe3par_clone(chef_run_pri.node['hpe3par']['clone']['create_offline']['clone_name']) }.to raise_error(
-    Chef::Exceptions::ValidationFailed, 'Option priority must be equal to one of: HIGH, MEDIUM, LOW!  You passed "INVALID".')
+    
+    chef_run.node.normal['hpe3par']['clone']['create_offline']['priority'] = 'INVALID'
+    expect{ chef_run.converge(described_recipe) }.to raise_error(Chef::Exceptions::ValidationFailed,
+    'Option priority must be equal to one of: HIGH, MEDIUM, LOW!  You passed "INVALID".')
   end
-
 end
